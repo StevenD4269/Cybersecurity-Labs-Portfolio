@@ -1,0 +1,28 @@
+# Section 1: Identify the network protocol involved in the incident
+## The protocols involved in this incident were primarily:
+
+DNS (Domain Name System) – an Application Layer protocol used to resolve domain names like yummyrecipesforme.com and greatrecipesforme.com into IP addresses.
+HTTP (Hypertext Transfer Protocol) – also an Application Layer protocol, used to request the website content and initiate the file download.
+TCP (Transmission Control Protocol) – a Transport Layer protocol that established and maintained the reliable connection between the user’s machine and the web servers.
+IP (Internet Protocol) – an Internet Layer protocol responsible for routing data packets between hosts.
+These protocols worked together to establish the connection, transmit the malicious file, and redirect the browser to a secondary malicious site.
+
+Section 2: Document the incident
+Several customers of yummyrecipesforme.com contacted the helpdesk to report suspicious website behavior. They noted that the site prompted them to download a file to access free recipes. After running the file, their browsers were redirected to a different domain (greatrecipesforme.com), and their personal computers began to perform poorly.
+
+The cybersecurity team replicated the issue in a sandbox environment and used tcpdump to analyze the traffic. The following sequence was observed:
+
+A DNS request was issued to resolve yummyrecipesforme.com.
+A TCP handshake was performed.
+An HTTP GET request was sent to load the homepage.
+A download prompt appeared for an executable file disguised as a browser update.
+Upon execution of the file, a second DNS request was made to greatrecipesforme.com.
+The browser was redirected, and an HTTP GET request was sent to the new domain.
+Analysis of the server’s source code confirmed that malicious JavaScript had been embedded into the page, causing the download prompt to appear automatically. Further investigation revealed the source of the breach: a brute force attack had been carried out on the admin panel using default credentials that had never been changed. Once access was gained, the attacker inserted the JavaScript and changed the admin password to lock out legitimate users.
+
+The tcpdump traffic logs corroborated this sequence, showing DNS and HTTP traffic for both domains, consistent with malware redirection behavior. There were no brute force protections or authentication hardening in place, allowing the attacker to easily gain access.
+
+Section 3: Recommend one remediation for brute force attacks
+To prevent similar brute force attacks in the future, it is recommended to implement Two-Factor Authentication (2FA) for all administrative logins.
+
+2FA adds a critical layer of security by requiring a second form of verification—such as a code from a mobile app or biometric input—alongside the password. This means that even if a password is guessed or compromised, unauthorized access is still blocked. For web administrators, enabling 2FA significantly reduces the risk of brute force attacks, credential stuffing, and unauthorized changes to the website’s content or functionality.
